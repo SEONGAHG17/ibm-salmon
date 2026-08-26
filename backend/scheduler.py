@@ -20,21 +20,31 @@ supabase: Optional[Client] = (
 
 # Firebase Admin SDK 절대 경로 기반 초기화
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH", os.path.join(BASE_DIR, "serviceAccountKey.json"))
-
-if not firebase_admin._apps:
-    if os.path.exists(cred_path):
-        cred = credentials.Certificate(cred_path)
-        firebase_admin.initialize_app(cred)
-        print("✅ [Firebase Admin] 초기화 성공")
-    else:
-        print(f"⚠️ [Firebase Admin] 키 파일을 찾을 수 없습니다: {cred_path}")
+cred_path = os.environ.get("FIREBASE_CREDENTIALS_PATH") or "serviceAccountKey.json"
+if not os.path.isabs(cred_path):
+    cred_path = os.path.join(BASE_DIR, cred_path)
 
 scheduler = AsyncIOScheduler()
+
+def ensure_firebase_admin() -> bool:
+    if firebase_admin._apps:
+        return True
+
+    if not os.path.exists(cred_path):
+        print(f"⚠️ [Firebase Admin] 키 파일을 찾을 수 없습니다: {cred_path}")
+        return False
+
+    cred = credentials.Certificate(cred_path)
+    firebase_admin.initialize_app(cred)
+    print("✅ [Firebase Admin] 초기화 성공")
+    return True
 
 async def send_fcm_notification(fcm_token: str, title: str, body: str):
     """FCM 단일 기기 푸시 발송 함수"""
     try:
+        if not ensure_firebase_admin():
+            return
+
         message = messaging.Message(
             notification=messaging.Notification(title=title, body=body),
             token=fcm_token,
