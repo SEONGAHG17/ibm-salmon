@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/fcm.dart';
 import 'calender.dart';
 import 'category.dart';
+import 'chat.dart';
 import 'history.dart';
 import 'upload.dart';
 
@@ -19,6 +20,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
     UploadScreen(),
     CalendarScreen(),
     CategoryScreen(),
+    ChatScreen(),
     HistoryScreen(),
   ];
 
@@ -52,6 +54,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             icon: Icon(Icons.category_outlined),
             selectedIcon: Icon(Icons.category),
             label: '카테고리',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.smart_toy_outlined),
+            selectedIcon: Icon(Icons.smart_toy),
+            label: '챗봇',
           ),
           NavigationDestination(
             icon: Icon(Icons.history_outlined),

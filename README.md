@@ -20,6 +20,7 @@ salmon/
         ├── screens/
         │   ├── calender.dart  # 일정 캘린더 뷰 (TableCalendar 연동)
         │   ├── category.dart  # 카테고리(맛집/공모전/장학금 등) 및 키워드 필터 뷰
+        │   ├── chat.dart      # Watsonx 기반 스크린샷 분석 챗봇
         │   ├── detail.dart    # 분석 결과 상세 보기 (네이버 지도, 웹 링크 연동)
         │   ├── history.dart   # 전체 분석 기록 리스트
         │   ├── nevigate.dart  # 하단 네비게이션 바 및 탭 전환 관리
@@ -29,3 +30,19 @@ salmon/
         │   └── fcm.dart       # FCM 디바이스 토큰 등록 및 푸시 알림 핸들러
         │
         └── main.dart          # Flutter 앱 시작점 및 Firebase 초기화
+```
+
+## Watsonx Chatbot
+
+백엔드에 `POST /api/v1/chat` 엔드포인트가 추가되어 저장된 스크린샷 분석 히스토리를 바탕으로 Watsonx Granite 모델이 답변합니다.
+
+필요 환경 변수:
+
+```env
+WATSONX_API_KEY=your_ibm_cloud_api_key
+WATSONX_PROJECT_ID=your_watsonx_project_id
+WATSONX_URL=https://us-south.ml.cloud.ibm.com
+WATSONX_CHAT_MODEL_ID=ibm/granite-3-8b-instruct
+```
+
+`WATSONX_CHAT_MODEL_ID`는 계정에서 사용 가능한 Granite 또는 Llama 계열 chat 모델 ID로 바꿀 수 있습니다.

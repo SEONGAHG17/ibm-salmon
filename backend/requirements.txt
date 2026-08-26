@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+python-multipart
+google-generativeai
+supabase
+qdrant-client
+ibm-watsonx-ai
+firebase-admin
+apscheduler

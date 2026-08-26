@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import '../constants/constants.dart';
+import 'chat.dart';
 
 class UploadScreen extends StatefulWidget {
   const UploadScreen({super.key});
@@ -43,11 +44,13 @@ class _UploadScreenState extends State<UploadScreen> {
       final ext = pickedFile.path.split('.').last.toLowerCase();
       final mimeType = (ext == 'png') ? 'image/png' : 'image/jpeg';
 
-      request.files.add(await http.MultipartFile.fromPath(
-        'file',
-        pickedFile.path,
-        contentType: MediaType.parse(mimeType),
-      ));
+      request.files.add(
+        await http.MultipartFile.fromPath(
+          'file',
+          pickedFile.path,
+          contentType: MediaType.parse(mimeType),
+        ),
+      );
 
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
@@ -58,18 +61,18 @@ class _UploadScreenState extends State<UploadScreen> {
           setState(() {
             _analysisResult = decoded['analysis'];
           });
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('분석 및 저장이 완료되었습니다!')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('분석 및 저장이 완료되었습니다!')));
         }
       } else {
         throw Exception('서버 응답 오류: ${response.statusCode}');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('업로드 실패: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('업로드 실패: $e')));
       }
     } finally {
       if (mounted) {
@@ -89,7 +92,11 @@ class _UploadScreenState extends State<UploadScreen> {
             if (_selectedImage != null)
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.file(_selectedImage!, height: 260, fit: BoxFit.cover),
+                child: Image.file(
+                  _selectedImage!,
+                  height: 260,
+                  fit: BoxFit.cover,
+                ),
               )
             else
               Container(
@@ -115,7 +122,10 @@ class _UploadScreenState extends State<UploadScreen> {
             else if (_analysisResult != null) ...[
               const Align(
                 alignment: Alignment.centerLeft,
-                child: Text('분석 결과', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                child: Text(
+                  '분석 결과',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(height: 8),
               Card(
@@ -124,17 +134,39 @@ class _UploadScreenState extends State<UploadScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('카테고리: ${_analysisResult?['category'] ?? '-'}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      Text(
+                        '카테고리: ${_analysisResult?['category'] ?? '-'}',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                       const SizedBox(height: 6),
                       Text('액션 타입: ${_analysisResult?['action_type'] ?? '-'}'),
                       const SizedBox(height: 6),
                       Text('요약: ${_analysisResult?['summary'] ?? '-'}'),
-                      if (_analysisResult?['action_data'] != null && _analysisResult?['action_data'] != "") ...[
+                      if (_analysisResult?['action_data'] != null &&
+                          _analysisResult?['action_data'] != "") ...[
                         const SizedBox(height: 6),
                         Text('상세: ${_analysisResult?['action_data']}'),
                       ],
                     ],
                   ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ChatScreen(
+                        initialPrompt: '방금 분석한 스크린샷을 기준으로 핵심 정보와 다음 행동을 정리해줘.',
+                      ),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.smart_toy_outlined),
+                label: const Text('Watson 챗봇에게 질문하기'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size.fromHeight(46),
                 ),
               ),
             ],
