@@ -5,6 +5,8 @@ python-multipart
 google-generativeai
 supabase
 qdrant-client
-ibm-watsonx-ai
+numpy==1.26.4
+pandas==2.2.3
+ibm-watsonx-ai==1.6.3
 firebase-admin
 apscheduler
