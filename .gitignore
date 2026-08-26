@@ -8,6 +8,7 @@ frontend/build/
 backend/__pycache__/
 backend/.env
 backend/serviceAccountKey.json
+.DS_Store
 
 # Android local/generated files
 frontend/android/.gradle/
