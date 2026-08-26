@@ -3,6 +3,10 @@ frontend/.dart_tool/
 frontend/.flutter-plugins-dependencies
 frontend/build/
 
+# Python local/generated files
+.venv/
+backend/__pycache__/
+
 # Android local/generated files
 frontend/android/.gradle/
 frontend/android/build/

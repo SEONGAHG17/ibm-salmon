@@ -5,7 +5,7 @@ import asyncio
 from dotenv import load_dotenv
 from typing import Any, Optional
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel, Field
@@ -33,9 +33,13 @@ app.include_router(calendar_router)
 app.include_router(map_router)
 
 # 1. 환경 변수 및 클라이언트 초기화
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+SUPABASE_URL = os.environ.get("SUPABASE_URL") or None
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY") or None
+supabase: Optional[Client] = (
+    create_client(SUPABASE_URL, SUPABASE_KEY)
+    if SUPABASE_URL and SUPABASE_KEY
+    else None
+)
 
 genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 model = genai.GenerativeModel('gemini-3.7-flash')
@@ -46,10 +50,10 @@ qdrant_client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY) if QDRANT_U
 
 # IBM watsonx 인증 정보 및 임베딩 설정
 watsonx_api_key = os.environ.get("WATSONX_API_KEY")
-watsonx_url = os.environ.get("WATSONX_URL", "https://us-south.ml.cloud.ibm.com")
+watsonx_url = os.environ.get("WATSONX_URL") or "https://us-south.ml.cloud.ibm.com"
 watsonx_project_id = os.environ.get("WATSONX_PROJECT_ID")
-embedding_model_id = os.environ.get("WATSONX_EMBEDDING_MODEL_ID", "intfloat/multilingual-e5-large")
-watsonx_chat_model_id = os.environ.get("WATSONX_CHAT_MODEL_ID", "ibm/granite-3-8b-instruct")
+embedding_model_id = os.environ.get("WATSONX_EMBEDDING_MODEL_ID") or "intfloat/multilingual-e5-large"
+watsonx_chat_model_id = os.environ.get("WATSONX_CHAT_MODEL_ID") or "ibm/granite-3-8b-instruct"
 
 credentials = Credentials(url=watsonx_url, api_key=watsonx_api_key) if watsonx_api_key else None
 
@@ -69,6 +73,8 @@ class DeviceTokenRequest(BaseModel):
 @app.post("/api/v1/devices/token")
 async def register_device_token(request: DeviceTokenRequest):
     try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Supabase 설정이 필요합니다.")
         supabase.table("user_devices").upsert({
             "user_id": request.user_id,
             "fcm_token": request.fcm_token
@@ -118,6 +124,9 @@ def _watsonx_ready() -> bool:
 
 
 def _select_history_items(user_id: str, limit: int) -> list[dict[str, Any]]:
+    if not supabase:
+        return []
+
     safe_limit = min(max(limit, 1), 30)
     response = (
         supabase.table("analyzed_items")
@@ -305,6 +314,9 @@ async def chat_with_watsonx(request: ChatRequest):
 @app.post("/api/v1/analyze", response_model=AnalysisResponse)
 async def process_and_analyze_image(file: UploadFile = File(...)):
     try:
+        if not supabase:
+            raise HTTPException(status_code=503, detail="Supabase 설정이 필요합니다.")
+
         file_bytes = await file.read()
         filename = f"screenshot_{int(time.time())}_{file.filename}"
         

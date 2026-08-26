@@ -5,13 +5,18 @@ from firebase_admin import credentials, messaging
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from supabase import create_client, Client
 from dotenv import load_dotenv
+from typing import Optional
 
-load_dotenv()
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 # Supabase 클라이언트 초기화
-SUPABASE_URL = os.environ.get("SUPABASE_URL")
-SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
-supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
+SUPABASE_URL = os.environ.get("SUPABASE_URL") or None
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY") or None
+supabase: Optional[Client] = (
+    create_client(SUPABASE_URL, SUPABASE_KEY)
+    if SUPABASE_URL and SUPABASE_KEY
+    else None
+)
 
 # Firebase Admin SDK 절대 경로 기반 초기화
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -41,6 +46,9 @@ async def send_fcm_notification(fcm_token: str, title: str, body: str):
 
 # 작업 1: 당일 스크린샷 정리 브리핑 (매일 21:00)
 async def check_daily_captures():
+    if not supabase:
+        return
+
     today_str = datetime.now().strftime("%Y-%m-%d")
     print(f"⏰ [스케줄러 실행] 당일 스크린샷 정리 체크 ({today_str})")
     
@@ -64,6 +72,9 @@ async def check_daily_captures():
 
 # 작업 2: 캘린더 D-1 마감/일정 알림 (매일 09:00)
 async def check_calendar_d_minus_one():
+    if not supabase:
+        return
+
     tomorrow_str = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
     print(f"⏰ [스케줄러 실행] 캘린더 D-1 마감 일정 체크 ({tomorrow_str})")
     
@@ -94,6 +105,10 @@ async def trigger_calendar_d1_test():
     await check_calendar_d_minus_one()
 
 def start_scheduler():
+    if not supabase:
+        print("⚠️ [APScheduler] Supabase 설정이 없어 스케줄러를 건너뜁니다.")
+        return
+
     scheduler.add_job(check_daily_captures, "cron", hour=21, minute=0)
     scheduler.add_job(check_calendar_d_minus_one, "cron", hour=9, minute=0)
     scheduler.start()
