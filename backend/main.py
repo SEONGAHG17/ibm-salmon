@@ -8,6 +8,7 @@ from typing import Any, Optional
 load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 import google.generativeai as genai
 from supabase import create_client, Client
@@ -31,6 +32,14 @@ app = FastAPI(title="T.Salmon API", version="1.0")
 app.include_router(history_router)
 app.include_router(calendar_router)
 app.include_router(map_router)
+
+
+@app.get("/chatbot-preview", include_in_schema=False)
+async def chatbot_preview():
+    preview_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "frontend", "chatbot_preview.html")
+    )
+    return FileResponse(preview_path)
 
 # 1. 환경 변수 및 클라이언트 초기화
 SUPABASE_URL = os.environ.get("SUPABASE_URL") or None

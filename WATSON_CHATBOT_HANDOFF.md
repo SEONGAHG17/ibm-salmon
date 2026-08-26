@@ -35,6 +35,16 @@ curl -X POST http://127.0.0.1:8000/api/v1/chat \
 
 `"provider":"local_fallback"`가 나오면 백엔드는 살아 있지만 Watsonx 키, 프로젝트 ID, 모델 ID 중 하나가 맞지 않는 상태다. 이 경우에도 데모용 기본 답변은 나온다.
 
+## 2-1. 챗봇 UI만 빠르게 보기
+
+Android 에뮬레이터나 실제 기기 없이 챗봇 화면만 보고 싶으면 백엔드를 켠 뒤 브라우저에서 아래 주소를 연다.
+
+```text
+http://127.0.0.1:8000/chatbot-preview
+```
+
+이 화면은 Flutter 앱의 챗봇 탭과 같은 질문 흐름으로 `POST /api/v1/chat`을 호출한다. 기존 업로드, 캘린더, Firebase 기능을 확인하지 않고 챗봇 UI와 Watsonx 응답만 빠르게 볼 때 사용한다.
+
 ## 3. Flutter 앱 실행
 
 Android 에뮬레이터 기준으로 `frontend/lib/constants/constants.dart`가 이미 `http://10.0.2.2:8000`을 바라본다.
