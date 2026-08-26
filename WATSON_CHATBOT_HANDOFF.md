@@ -1,5 +1,29 @@
 # Watson 챗봇 실행/테스트/전달 가이드
 
+## 0. 현재 화면 판별법
+
+브라우저 미리보기에서 챗봇 UI가 뜨고 터미널에 `POST /api/v1/chat HTTP/1.1" 200 OK`가 보이면 UI와 백엔드 API 연결은 성공이다.
+
+답변 아래 또는 응답 JSON의 `provider` 값으로 Watsonx 연결 상태를 판단한다.
+
+```text
+provider: watsonx
+```
+
+Watsonx 모델 호출까지 성공한 상태다.
+
+```text
+provider: local_fallback
+```
+
+챗봇 UI와 백엔드는 정상 작동하지만 Watsonx 호출만 실패한 상태다. 터미널에 `Provided API key could not be found`가 보이면 `WATSONX_API_KEY`가 잘못됐거나 IBM Cloud에서 삭제된 키다. 새 IBM Cloud IAM API key를 발급해 `backend/.env`에 다시 넣는다.
+
+```text
+provider: error
+```
+
+브라우저가 백엔드 서버에 닿지 못한 상태다. 서버가 켜져 있는지, 포트가 `8000`인지 확인한다.
+
 ## 1. 백엔드 실행
 
 루트 폴더 기준:
@@ -19,6 +43,22 @@ WATSONX_API_KEY=...
 WATSONX_PROJECT_ID=...
 WATSONX_URL=https://us-south.ml.cloud.ibm.com
 WATSONX_CHAT_MODEL_ID=ibm/granite-3-8b-instruct
+```
+
+`WATSONX_API_KEY`는 watsonx 화면의 프로젝트 ID가 아니라 IBM Cloud IAM API key다. IBM Cloud 콘솔에서 `Manage > Access (IAM) > API keys`로 새로 만든다.
+
+`WATSONX_PROJECT_ID`는 watsonx.ai 프로젝트의 `Manage > General > Details`에서 복사한다.
+
+프로젝트 리전이 Dallas가 아니면 `WATSONX_URL`을 프로젝트 리전에 맞게 바꾼다.
+
+```text
+Dallas: https://us-south.ml.cloud.ibm.com
+Frankfurt: https://eu-de.ml.cloud.ibm.com
+London: https://eu-gb.ml.cloud.ibm.com
+Tokyo: https://jp-tok.ml.cloud.ibm.com
+Sydney: https://au-syd.ml.cloud.ibm.com
+Toronto: https://ca-tor.ml.cloud.ibm.com
+Mumbai: https://ap-south-1.aws.wxai.ibm.com
 ```
 
 ## 2. 챗봇 API만 먼저 테스트
@@ -44,6 +84,17 @@ http://127.0.0.1:8000/chatbot-preview
 ```
 
 이 화면은 Flutter 앱의 챗봇 탭과 같은 질문 흐름으로 `POST /api/v1/chat`을 호출한다. 기존 업로드, 캘린더, Firebase 기능을 확인하지 않고 챗봇 UI와 Watsonx 응답만 빠르게 볼 때 사용한다.
+
+미리보기에서 확인할 기능:
+
+```text
+연결 상태 배너
+추천 질문 버튼
+답변 복사
+대화 초기화
+Watsonx/Fallback 라벨
+근거 스크린샷 칩
+```
 
 ## 3. Flutter 앱 실행
 
@@ -94,3 +145,63 @@ frontend/lib/screens/upload.dart
 ```
 
 충돌이 걱정되면 zip으로 통째로 보내지 말고 PR 링크를 보내는 것이 가장 안전하다.
+
+## 6. 메인 개발자 연결 체크리스트
+
+메인 개발자는 아래 순서로 붙이면 된다.
+
+```text
+1. 이 브랜치를 pull 또는 PR merge
+2. backend/.env.example을 참고해 backend/.env를 로컬에 생성
+3. WATSONX_API_KEY, WATSONX_PROJECT_ID, WATSONX_URL 설정
+4. 백엔드 실행
+5. http://127.0.0.1:8000/chatbot-preview에서 provider가 watsonx인지 확인
+6. Flutter 앱에서 하단 챗봇 탭 확인
+7. 실제 기기 테스트 시 frontend/lib/constants/constants.dart의 baseUrl을 노트북 IP로 변경
+```
+
+주요 연결 파일:
+
+```text
+backend/main.py
+  POST /api/v1/chat
+  GET /api/v1/chat/status
+  GET /chatbot-preview
+
+frontend/lib/screens/chat.dart
+  Flutter 앱 챗봇 탭 UI
+
+frontend/lib/screens/nevigate.dart
+  하단 탭에 챗봇 추가
+
+frontend/lib/screens/upload.dart
+  분석 결과에서 챗봇으로 이동 버튼
+
+frontend/chatbot_preview.html
+  Android 없이 챗봇만 확인하는 브라우저 미리보기
+```
+
+챗봇 API 요청 형식:
+
+```json
+{
+  "message": "지도에서 볼 항목 정리해줘",
+  "user_id": "default_user",
+  "history": [
+    {"role": "user", "content": "최근 저장한 항목 요약해줘"}
+  ]
+}
+```
+
+챗봇 API 응답 형식:
+
+```json
+{
+  "status": "success",
+  "reply": "답변 내용",
+  "provider": "watsonx",
+  "model": "ibm/granite-3-8b-instruct",
+  "notice": "Watsonx Granite 모델로 생성한 응답입니다.",
+  "citations": []
+}
+```

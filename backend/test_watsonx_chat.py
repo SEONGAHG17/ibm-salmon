@@ -15,6 +15,7 @@ async def main():
     print(f"status: {data['status']}")
     print(f"provider: {data['provider']}")
     print(f"model: {data['model']}")
+    print(f"notice: {data.get('notice')}")
     print(f"reply: {data['reply']}")
     print(f"citations_count: {len(data['citations'])}")
 

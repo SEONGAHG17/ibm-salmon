@@ -46,3 +46,11 @@ WATSONX_CHAT_MODEL_ID=ibm/granite-3-8b-instruct
 ```
 
 `WATSONX_CHAT_MODEL_ID`는 계정에서 사용 가능한 Granite 또는 Llama 계열 chat 모델 ID로 바꿀 수 있습니다.
+
+챗봇 UI만 빠르게 확인하려면 백엔드를 켠 뒤 브라우저에서 아래 주소를 엽니다.
+
+```text
+http://127.0.0.1:8000/chatbot-preview
+```
+
+응답 라벨이 `Watsonx 응답`이면 모델 호출까지 성공한 상태이고, `로컬 보조 응답`이면 UI와 API는 정상이나 Watsonx 인증/권한을 확인해야 하는 상태입니다.

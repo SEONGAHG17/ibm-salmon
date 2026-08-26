@@ -125,11 +125,35 @@ class ChatResponse(BaseModel):
     reply: str
     provider: str
     model: str
+    notice: Optional[str] = None
     citations: list[ChatCitation] = Field(default_factory=list)
+
+
+class ChatStatusResponse(BaseModel):
+    status: str
+    watsonx_configured: bool
+    supabase_configured: bool
+    model: str
+    message: str
 
 
 def _watsonx_ready() -> bool:
     return bool(credentials and watsonx_project_id)
+
+
+def _format_watsonx_notice(error_message: str) -> str:
+    normalized = error_message.lower()
+    if "provided api key could not be found" in normalized or "api key could not be found" in normalized:
+        return "IBM Cloud API 키가 유효하지 않습니다. 새 API key를 발급해 WATSONX_API_KEY에 넣어주세요."
+    if "401" in normalized or "403" in normalized or "credential" in normalized or "authenticat" in normalized:
+        return "Watsonx 인증에 실패했습니다. API key, 프로젝트 권한, watsonx.ai Runtime 권한을 확인해주세요."
+    if "project" in normalized:
+        return "WATSONX_PROJECT_ID가 현재 IBM 계정의 watsonx.ai 프로젝트와 맞는지 확인해주세요."
+    if "nodename" in normalized or "servname" in normalized or "resolve" in normalized:
+        return "IBM Watsonx 주소에 연결하지 못했습니다. 네트워크, VPN, DNS 상태를 확인해주세요."
+    if "환경 변수" in error_message:
+        return "Watsonx 환경 변수가 아직 설정되지 않았습니다."
+    return "Watsonx 호출에 실패해 로컬 보조 응답으로 전환했습니다."
 
 
 def _select_history_items(user_id: str, limit: int) -> list[dict[str, Any]]:
@@ -304,20 +328,41 @@ async def chat_with_watsonx(request: ChatRequest):
         try:
             reply = await _ask_watsonx(messages)
             provider = "watsonx"
+            notice = "Watsonx Granite 모델로 생성한 응답입니다."
         except Exception as watson_error:
             print(f"⚠️ [Watsonx Chat Fallback] {str(watson_error)}")
             reply = _fallback_chat_reply(question, relevant_items)
             provider = "local_fallback"
+            notice = _format_watsonx_notice(str(watson_error))
 
         return ChatResponse(
             status="success",
             reply=reply,
             provider=provider,
             model=watsonx_chat_model_id,
+            notice=notice,
             citations=_to_citations(relevant_items),
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"챗봇 응답 실패: {str(e)}")
+
+
+@app.get("/api/v1/chat/status", response_model=ChatStatusResponse)
+async def chat_status():
+    watsonx_configured = _watsonx_ready()
+    supabase_configured = bool(supabase)
+    if watsonx_configured:
+        message = "Watsonx 환경 변수가 설정되어 있습니다. 실제 연결은 질문을 보낼 때 검증됩니다."
+    else:
+        message = "Watsonx API key와 프로젝트 ID를 backend/.env에 설정해주세요."
+
+    return ChatStatusResponse(
+        status="success",
+        watsonx_configured=watsonx_configured,
+        supabase_configured=supabase_configured,
+        model=watsonx_chat_model_id,
+        message=message,
+    )
 
 
 @app.post("/api/v1/analyze", response_model=AnalysisResponse)
