@@ -42,7 +42,7 @@ salmon/
 WATSONX_API_KEY=your_ibm_cloud_api_key
 WATSONX_PROJECT_ID=your_watsonx_project_id
 WATSONX_URL=https://us-south.ml.cloud.ibm.com
-WATSONX_CHAT_MODEL_ID=ibm/granite-3-8b-instruct
+WATSONX_CHAT_MODEL_ID=ibm/granite-4-h-small
 ```
 
 `WATSONX_CHAT_MODEL_ID`는 계정에서 사용 가능한 Granite 또는 Llama 계열 chat 모델 ID로 바꿀 수 있습니다.

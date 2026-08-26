@@ -42,7 +42,7 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8000
 WATSONX_API_KEY=...
 WATSONX_PROJECT_ID=...
 WATSONX_URL=https://us-south.ml.cloud.ibm.com
-WATSONX_CHAT_MODEL_ID=ibm/granite-3-8b-instruct
+WATSONX_CHAT_MODEL_ID=ibm/granite-4-h-small
 ```
 
 `WATSONX_API_KEY`는 watsonx 화면의 프로젝트 ID가 아니라 IBM Cloud IAM API key다. IBM Cloud 콘솔에서 `Manage > Access (IAM) > API keys`로 새로 만든다.
@@ -200,7 +200,7 @@ frontend/chatbot_preview.html
   "status": "success",
   "reply": "답변 내용",
   "provider": "watsonx",
-  "model": "ibm/granite-3-8b-instruct",
+  "model": "ibm/granite-4-h-small",
   "notice": "Watsonx Granite 모델로 생성한 응답입니다.",
   "citations": []
 }

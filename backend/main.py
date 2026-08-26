@@ -62,7 +62,7 @@ watsonx_api_key = os.environ.get("WATSONX_API_KEY")
 watsonx_url = os.environ.get("WATSONX_URL") or "https://us-south.ml.cloud.ibm.com"
 watsonx_project_id = os.environ.get("WATSONX_PROJECT_ID")
 embedding_model_id = os.environ.get("WATSONX_EMBEDDING_MODEL_ID") or "intfloat/multilingual-e5-large"
-watsonx_chat_model_id = os.environ.get("WATSONX_CHAT_MODEL_ID") or "ibm/granite-3-8b-instruct"
+watsonx_chat_model_id = os.environ.get("WATSONX_CHAT_MODEL_ID") or "ibm/granite-4-h-small"
 
 credentials = Credentials(url=watsonx_url, api_key=watsonx_api_key) if watsonx_api_key else None
 
