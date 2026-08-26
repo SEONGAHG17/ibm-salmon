@@ -1,0 +1,9 @@
+# Flutter and Dart
+frontend/.dart_tool/
+frontend/.flutter-plugins-dependencies
+frontend/build/
+
+# Android local/generated files
+frontend/android/.gradle/
+frontend/android/build/
+frontend/android/local.properties

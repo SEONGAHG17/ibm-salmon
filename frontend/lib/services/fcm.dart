@@ -7,14 +7,23 @@ import '../constants/constants.dart';
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  debugPrint("📩 [FCM 백그라운드 수신]: ${message.notification?.title}");
+  try {
+    await Firebase.initializeApp();
+    debugPrint("📩 [FCM 백그라운드 수신]: ${message.notification?.title}");
+  } catch (e) {
+    debugPrint("FCM 백그라운드 초기화를 건너뜀: $e");
+  }
 }
 
 class FcmService {
+  static bool isEnabled = false;
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
 
   static Future<void> initialize(BuildContext context) async {
+    if (!isEnabled) {
+      return;
+    }
+
     try {
       NotificationSettings settings = await _messaging.requestPermission(
         alert: true,

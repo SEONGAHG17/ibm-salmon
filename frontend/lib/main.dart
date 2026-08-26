@@ -6,8 +6,13 @@ import 'services/fcm.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  try {
+    await Firebase.initializeApp();
+    FcmService.isEnabled = true;
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+  } catch (e) {
+    debugPrint("Firebase 초기화를 건너뜀: $e");
+  }
   runApp(const MyApp());
 }
 
