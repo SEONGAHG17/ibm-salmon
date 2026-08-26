@@ -2,9 +2,9 @@
 
 ## 0. 현재 화면 판별법
 
-브라우저 미리보기에서 챗봇 UI가 뜨고 터미널에 `POST /api/v1/chat HTTP/1.1" 200 OK`가 보이면 UI와 백엔드 API 연결은 성공이다.
+브라우저 미리보기에서 챗봇 UI가 뜨고 터미널에 `POST /api/v1/chat HTTP/1.1" 200 OK`가 보이면 UI와 백엔드 API 연결은 성공이다. 사용자 화면에는 Watsonx, fallback, model 같은 내부 상태 라벨을 노출하지 않는다.
 
-답변 아래 또는 응답 JSON의 `provider` 값으로 Watsonx 연결 상태를 판단한다.
+Watsonx 연결 상태는 테스트 스크립트 또는 응답 JSON의 `provider` 값으로 판단한다.
 
 ```text
 provider: watsonx
@@ -83,16 +83,14 @@ Android 에뮬레이터나 실제 기기 없이 챗봇 화면만 보고 싶으�
 http://127.0.0.1:8000/chatbot-preview
 ```
 
-이 화면은 Flutter 앱의 챗봇 탭과 같은 질문 흐름으로 `POST /api/v1/chat`을 호출한다. 기존 업로드, 캘린더, Firebase 기능을 확인하지 않고 챗봇 UI와 Watsonx 응답만 빠르게 볼 때 사용한다.
+이 화면은 Flutter 앱의 챗봇 탭과 같은 질문 흐름으로 `POST /api/v1/chat`을 호출한다. 기존 업로드, 캘린더, Firebase 기능을 확인하지 않고 챗봇 대화만 빠르게 볼 때 사용한다.
 
 미리보기에서 확인할 기능:
 
 ```text
-연결 상태 배너
 추천 질문 버튼
 답변 복사
 대화 초기화
-Watsonx/Fallback 라벨
 근거 스크린샷 칩
 ```
 
@@ -155,9 +153,10 @@ frontend/lib/screens/upload.dart
 2. backend/.env.example을 참고해 backend/.env를 로컬에 생성
 3. WATSONX_API_KEY, WATSONX_PROJECT_ID, WATSONX_URL 설정
 4. 백엔드 실행
-5. http://127.0.0.1:8000/chatbot-preview에서 provider가 watsonx인지 확인
-6. Flutter 앱에서 하단 챗봇 탭 확인
-7. 실제 기기 테스트 시 frontend/lib/constants/constants.dart의 baseUrl을 노트북 IP로 변경
+5. python backend/test_watsonx_chat.py에서 provider가 watsonx인지 확인
+6. http://127.0.0.1:8000/chatbot-preview에서 실제 사용자 UI 확인
+7. Flutter 앱에서 하단 챗봇 탭 확인
+8. 실제 기기 테스트 시 frontend/lib/constants/constants.dart의 baseUrl을 노트북 IP로 변경
 ```
 
 주요 연결 파일:

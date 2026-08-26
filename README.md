@@ -53,4 +53,4 @@ WATSONX_CHAT_MODEL_ID=ibm/granite-4-h-small
 http://127.0.0.1:8000/chatbot-preview
 ```
 
-응답 라벨이 `Watsonx 응답`이면 모델 호출까지 성공한 상태이고, `로컬 보조 응답`이면 UI와 API는 정상이나 Watsonx 인증/권한을 확인해야 하는 상태입니다.
+사용자 화면에는 내부 모델명이나 테스트 라벨을 노출하지 않습니다. Watsonx 연결 여부는 `python backend/test_watsonx_chat.py` 또는 `/api/v1/chat` 응답의 `provider` 값으로 확인합니다.

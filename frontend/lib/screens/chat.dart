@@ -16,34 +16,36 @@ class ChatScreen extends StatefulWidget {
 }
 
 class _ChatScreenState extends State<ChatScreen> {
+  static const _ink = Color(0xFF22201F);
+  static const _muted = Color(0xFF7B7370);
+  static const _paper = Color(0xFFFFFCF8);
+  static const _wash = Color(0xFFF7F1EC);
+
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<_ChatMessage> _messages = [
     const _ChatMessage(
       role: 'assistant',
-      content: '안녕하세요. 저장된 스크린샷 분석 결과를 바탕으로 바로 정리해드릴게요.',
+      content: '찾고 싶은 내용을 말해줘. 저장된 스크린샷에서 필요한 것만 골라볼게.',
     ),
   ];
 
   bool _isSending = false;
-  String _statusProvider = 'idle';
-  String _statusNotice = '챗봇 UI와 백엔드를 확인할 준비가 됐습니다.';
-  int _lastCitationCount = 0;
 
   static const List<_QuickPrompt> _quickPrompts = [
     _QuickPrompt(
-      icon: Icons.summarize_outlined,
+      icon: Icons.search_outlined,
       label: '요약',
       prompt: '최근 저장한 항목 요약해줘',
     ),
     _QuickPrompt(
-      icon: Icons.event_available_outlined,
-      label: '일정',
-      prompt: '일정등록 항목만 알려줘',
+      icon: Icons.event_note_outlined,
+      label: '마감',
+      prompt: '마감일 있는 항목만 정리해줘',
     ),
     _QuickPrompt(
-      icon: Icons.map_outlined,
-      label: '지도',
+      icon: Icons.place_outlined,
+      label: '장소',
       prompt: '지도에서 볼 항목 정리해줘',
     ),
     _QuickPrompt(
@@ -52,9 +54,9 @@ class _ChatScreenState extends State<ChatScreen> {
       prompt: '장학금 관련 정보 있어?',
     ),
     _QuickPrompt(
-      icon: Icons.link_outlined,
-      label: '링크',
-      prompt: '바로 열어볼 링크만 정리해줘',
+      icon: Icons.card_giftcard_outlined,
+      label: '쿠폰',
+      prompt: '쿠폰이나 기프티콘 사용기한 알려줘',
     ),
   ];
 
@@ -91,8 +93,6 @@ class _ChatScreenState extends State<ChatScreen> {
       _messages.add(_ChatMessage(role: 'user', content: messageText));
       _isSending = true;
       _messageController.clear();
-      _statusProvider = 'loading';
-      _statusNotice = '스크린샷 기록과 Watsonx 응답을 확인하고 있습니다.';
     });
     _scrollToBottom();
 
@@ -118,30 +118,23 @@ class _ChatScreenState extends State<ChatScreen> {
       final citations = _Citation.fromList(decoded['citations']);
 
       setState(() {
-        _statusProvider = provider;
-        _statusNotice = notice ?? _providerSummary(provider);
-        _lastCitationCount = citations.length;
         _messages.add(
           _ChatMessage(
             role: 'assistant',
-            content: reply == null || reply.isEmpty ? '답변을 생성하지 못했습니다.' : reply,
+            content: reply == null || reply.isEmpty ? '답변을 만들지 못했어. 다시 물어봐줘.' : reply,
             provider: provider,
             notice: notice,
             citations: citations,
           ),
         );
       });
-    } catch (e) {
+    } catch (_) {
       setState(() {
-        _statusProvider = 'error';
-        _statusNotice = '백엔드 서버 또는 네트워크 연결을 확인해주세요.';
-        _lastCitationCount = 0;
         _messages.add(
-          _ChatMessage(
+          const _ChatMessage(
             role: 'assistant',
-            content: '챗봇 연결에 실패했습니다. 백엔드 서버와 Watsonx 설정을 확인해주세요.\n$e',
+            content: '지금은 연결이 불안정해. 서버를 켠 뒤 다시 시도해줘.',
             provider: 'error',
-            notice: '요청이 서버까지 도달하지 못했습니다.',
           ),
         );
       });
@@ -153,15 +146,6 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  String _providerSummary(String provider) {
-    return switch (provider) {
-      'watsonx' => 'Watsonx Granite 모델로 생성한 응답입니다.',
-      'local_fallback' => 'Watsonx 대신 로컬 보조 응답으로 전환했습니다.',
-      'error' => '챗봇 연결에 실패했습니다.',
-      _ => '챗봇이 응답을 준비했습니다.',
-    };
-  }
-
   void _clearChat() {
     setState(() {
       _messages
@@ -169,12 +153,9 @@ class _ChatScreenState extends State<ChatScreen> {
         ..add(
           const _ChatMessage(
             role: 'assistant',
-            content: '대화를 초기화했습니다. 다시 질문해보세요.',
+            content: '좋아, 새로 시작하자. 어떤 스크린샷 정보를 찾을까?',
           ),
         );
-      _statusProvider = 'idle';
-      _statusNotice = '챗봇 UI와 백엔드를 확인할 준비가 됐습니다.';
-      _lastCitationCount = 0;
     });
   }
 
@@ -191,42 +172,46 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: colorScheme.surface,
+      backgroundColor: _wash,
       appBar: AppBar(
+        backgroundColor: _paper,
+        foregroundColor: _ink,
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
         titleSpacing: 16,
         title: const Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Watson 챗봇'),
             Text(
-              'watsonx Granite',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+              'T.Salmon',
+              style: TextStyle(fontWeight: FontWeight.w800),
+            ),
+            Text(
+              '스크린샷 정리',
+              style: TextStyle(
+                color: _muted,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ],
         ),
         actions: [
           IconButton(
             onPressed: _messages.length > 1 ? _clearChat : null,
-            icon: const Icon(Icons.delete_outline),
-            tooltip: '대화 초기화',
+            icon: const Icon(Icons.refresh),
+            tooltip: '새 대화',
           ),
         ],
       ),
       body: SafeArea(
         child: Column(
           children: [
-            _ConnectionBanner(
-              provider: _statusProvider,
-              notice: _statusNotice,
-              citationCount: _lastCitationCount,
-              isSending: _isSending,
-            ),
             Expanded(
               child: ListView.builder(
                 controller: _scrollController,
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 8),
+                padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                 itemCount: _messages.length + (_isSending ? 1 : 0),
                 itemBuilder: (context, index) {
                   if (_isSending && index == _messages.length) {
@@ -269,6 +254,8 @@ class _ChatMessage {
   });
 
   bool get isUser => role == 'user';
+  bool get isError => provider == 'error';
+  bool get isLimited => provider == 'local_fallback';
 }
 
 class _Citation {
@@ -313,150 +300,13 @@ class _QuickPrompt {
   });
 }
 
-class _ConnectionBanner extends StatelessWidget {
-  final String provider;
-  final String notice;
-  final int citationCount;
-  final bool isSending;
-
-  const _ConnectionBanner({
-    required this.provider,
-    required this.notice,
-    required this.citationCount,
-    required this.isSending,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final status = switch (provider) {
-      'watsonx' => (
-          title: 'Watsonx 연결됨',
-          icon: Icons.verified_outlined,
-          color: Colors.deepPurple,
-        ),
-      'local_fallback' => (
-          title: '서버 연결됨',
-          icon: Icons.info_outline,
-          color: Colors.amber.shade800,
-        ),
-      'error' => (
-          title: '연결 오류',
-          icon: Icons.error_outline,
-          color: Colors.redAccent,
-        ),
-      'loading' => (
-          title: '응답 생성 중',
-          icon: Icons.sync,
-          color: Colors.blueGrey,
-        ),
-      _ => (
-          title: '챗봇 준비됨',
-          icon: Icons.smart_toy_outlined,
-          color: Colors.deepPurple,
-        ),
-    };
-
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: status.color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: status.color.withValues(alpha: 0.22)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(status.icon, color: status.color, size: 22),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        status.title,
-                        style: TextStyle(
-                          color: status.color,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    if (isSending)
-                      SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: status.color,
-                        ),
-                      ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  notice,
-                  style: const TextStyle(fontSize: 12, height: 1.3),
-                ),
-                const SizedBox(height: 8),
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 6,
-                  children: [
-                    _MiniBadge(
-                      icon: Icons.memory_outlined,
-                      label: provider == 'watsonx' ? 'Watsonx' : 'Fallback',
-                    ),
-                    _MiniBadge(
-                      icon: Icons.article_outlined,
-                      label: '근거 $citationCount개',
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MiniBadge extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _MiniBadge({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.86),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.black.withValues(alpha: 0.06)),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 class _MessageBubble extends StatelessWidget {
+  static const _ink = Color(0xFF22201F);
+  static const _muted = Color(0xFF7B7370);
+  static const _line = Color(0xFFE7DCD4);
+  static const _salmon = Color(0xFFE76F61);
+  static const _warning = Color(0xFF9A5B13);
+
   final _ChatMessage message;
 
   const _MessageBubble({required this.message});
@@ -464,18 +314,8 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUser = message.isUser;
-    final provider = message.provider;
-    final providerLabel = switch (provider) {
-      'watsonx' => 'Watsonx 응답',
-      'error' => '연결 오류',
-      'local_fallback' => '로컬 보조 응답',
-      _ => null,
-    };
-    final providerColor = switch (provider) {
-      'watsonx' => Colors.deepPurple,
-      'error' => Colors.redAccent,
-      _ => Colors.grey.shade700,
-    };
+    final bubbleColor = isUser ? _salmon : Colors.white;
+    final textColor = isUser ? Colors.white : _ink;
 
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -484,16 +324,24 @@ class _MessageBubble extends StatelessWidget {
           maxWidth: MediaQuery.sizeOf(context).width * 0.84,
         ),
         margin: const EdgeInsets.symmetric(vertical: 6),
-        padding: const EdgeInsets.fromLTRB(14, 10, 12, 10),
+        padding: const EdgeInsets.fromLTRB(14, 11, 12, 10),
         decoration: BoxDecoration(
-          color: isUser ? Colors.deepPurple : Colors.grey.shade100,
+          color: bubbleColor,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(8),
             topRight: const Radius.circular(8),
             bottomLeft: Radius.circular(isUser ? 8 : 2),
             bottomRight: Radius.circular(isUser ? 2 : 8),
           ),
-          border: isUser ? null : Border.all(color: Colors.grey.shade200),
+          border: isUser ? null : Border.all(color: _line),
+          boxShadow: [
+            if (!isUser)
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.035),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,47 +349,51 @@ class _MessageBubble extends StatelessWidget {
             Text(
               message.content,
               style: TextStyle(
-                color: isUser ? Colors.white : Colors.black87,
+                color: textColor,
                 fontSize: 15,
-                height: 1.38,
+                height: 1.42,
+                fontWeight: FontWeight.w500,
               ),
             ),
             if (!isUser && message.citations.isNotEmpty) ...[
               const SizedBox(height: 10),
               _CitationWrap(citations: message.citations),
             ],
-            if (!isUser && providerLabel != null) ...[
+            if (!isUser && message.isLimited) ...[
               const SizedBox(height: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.auto_awesome, size: 13, color: providerColor),
-                  const SizedBox(width: 4),
-                  Text(
-                    providerLabel,
-                    style: TextStyle(
-                      color: providerColor,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w700,
-                    ),
+              const _SoftNote(
+                icon: Icons.history_outlined,
+                label: '저장된 기록 기준',
+                color: _warning,
+              ),
+            ],
+            if (!isUser && message.isError) ...[
+              const SizedBox(height: 8),
+              const _SoftNote(
+                icon: Icons.wifi_off_outlined,
+                label: '잠시 후 다시 시도',
+                color: _warning,
+              ),
+            ],
+            if (!isUser) ...[
+              const SizedBox(height: 7),
+              Align(
+                alignment: Alignment.centerRight,
+                child: InkWell(
+                  onTap: () async {
+                    await Clipboard.setData(ClipboardData(text: message.content));
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('답변을 복사했습니다.')),
+                      );
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(8),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    child: Icon(Icons.copy, size: 15, color: _muted),
                   ),
-                  const SizedBox(width: 6),
-                  InkWell(
-                    onTap: () async {
-                      await Clipboard.setData(ClipboardData(text: message.content));
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('답변을 복사했습니다.')),
-                        );
-                      }
-                    },
-                    borderRadius: BorderRadius.circular(8),
-                    child: Padding(
-                      padding: const EdgeInsets.all(4),
-                      child: Icon(Icons.copy, size: 14, color: providerColor),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ],
@@ -551,7 +403,41 @@ class _MessageBubble extends StatelessWidget {
   }
 }
 
+class _SoftNote extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+
+  const _SoftNote({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 13, color: color),
+        const SizedBox(width: 4),
+        Text(
+          label,
+          style: TextStyle(
+            color: color,
+            fontSize: 11,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _CitationWrap extends StatelessWidget {
+  static const _line = Color(0xFFE7DCD4);
+  static const _sage = Color(0xFF4D7C6F);
+
   final List<_Citation> citations;
 
   const _CitationWrap({required this.citations});
@@ -562,21 +448,25 @@ class _CitationWrap extends StatelessWidget {
       spacing: 6,
       runSpacing: 6,
       children: citations.take(3).map((citation) {
-        final label = citation.actionData.isNotEmpty
-            ? '${citation.category} · ${citation.actionType}'
-            : citation.category;
+        final label = citation.actionType == '해당없음'
+            ? citation.category
+            : '${citation.category} · ${citation.actionType}';
         return Tooltip(
           message: citation.summary,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFFF6FAF7),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade300),
+              border: Border.all(color: _line),
             ),
             child: Text(
               label,
-              style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                color: _sage,
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         );
@@ -596,9 +486,9 @@ class _TypingBubble extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 6),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: const Color(0xFFE7DCD4)),
         ),
         child: const Row(
           mainAxisSize: MainAxisSize.min,
@@ -606,10 +496,13 @@ class _TypingBubble extends StatelessWidget {
             SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: Color(0xFFE76F61),
+              ),
             ),
             SizedBox(width: 8),
-            Text('답변 생성 중', style: TextStyle(fontSize: 12)),
+            Text('정리 중', style: TextStyle(fontSize: 12)),
           ],
         ),
       ),
@@ -618,6 +511,10 @@ class _TypingBubble extends StatelessWidget {
 }
 
 class _QuickPromptBar extends StatelessWidget {
+  static const _line = Color(0xFFE7DCD4);
+  static const _ink = Color(0xFF22201F);
+  static const _sage = Color(0xFF4D7C6F);
+
   final List<_QuickPrompt> prompts;
   final bool enabled;
   final ValueChanged<String> onSelected;
@@ -630,23 +527,26 @@ class _QuickPromptBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
       height: 54,
+      color: const Color(0xFFFFFCF8),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         itemCount: prompts.length,
         separatorBuilder: (context, index) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final prompt = prompts[index];
           return ActionChip(
-            avatar: Icon(prompt.icon, size: 16),
-            label: Text('${prompt.label} · ${prompt.prompt}'),
-            onPressed: enabled ? () => onSelected(prompt.prompt) : null,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant),
+            avatar: Icon(prompt.icon, size: 16, color: _sage),
+            label: Text(
+              prompt.label,
+              style: const TextStyle(color: _ink, fontWeight: FontWeight.w700),
             ),
+            backgroundColor: Colors.white,
+            side: const BorderSide(color: _line),
+            onPressed: enabled ? () => onSelected(prompt.prompt) : null,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           );
         },
       ),
@@ -655,6 +555,9 @@ class _QuickPromptBar extends StatelessWidget {
 }
 
 class _ChatInput extends StatelessWidget {
+  static const _line = Color(0xFFE7DCD4);
+  static const _salmon = Color(0xFFE76F61);
+
   final TextEditingController controller;
   final bool enabled;
   final VoidCallback onSubmitted;
@@ -669,9 +572,9 @@ class _ChatInput extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
+      decoration: const BoxDecoration(
+        color: Color(0xFFFFFCF8),
+        border: Border(top: BorderSide(color: _line)),
       ),
       child: Row(
         children: [
@@ -684,12 +587,15 @@ class _ChatInput extends StatelessWidget {
               textInputAction: TextInputAction.send,
               decoration: InputDecoration(
                 hintText: '질문 입력',
-                prefixIcon: const Icon(Icons.chat_bubble_outline),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: const Color(0xFFF5EFEB),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: _salmon),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -706,6 +612,10 @@ class _ChatInput extends StatelessWidget {
             width: 48,
             height: 48,
             child: IconButton.filled(
+              style: IconButton.styleFrom(
+                backgroundColor: _salmon,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
               onPressed: enabled ? onSubmitted : null,
               icon: const Icon(Icons.send),
               tooltip: '전송',

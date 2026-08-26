@@ -3,21 +3,20 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Watson 챗봇 미리보기</title>
+  <title>T.Salmon 스크린샷 정리</title>
   <style>
     :root {
       color-scheme: light;
-      --ink: #1d1b20;
-      --muted: #6f6877;
-      --line: #e7dff0;
-      --purple: #6750a4;
-      --purple-deep: #4f378b;
-      --purple-soft: #f4effa;
-      --green: #146c43;
-      --amber: #8a5a00;
-      --red: #b3261e;
-      --surface: #fffbff;
-      --surface-2: #f7f2fa;
+      --ink: #22201f;
+      --muted: #7b7370;
+      --paper: #fffcf8;
+      --wash: #f7f1ec;
+      --line: #e7dcd4;
+      --salmon: #e76f61;
+      --salmon-dark: #b84e44;
+      --sage: #4d7c6f;
+      --sage-soft: #f2f8f5;
+      --warning: #9a5b13;
     }
 
     * {
@@ -27,9 +26,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        linear-gradient(90deg, rgba(103, 80, 164, .08), transparent 34%),
-        #f5f1f8;
+      background: #eee8e2;
       color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
@@ -47,30 +44,27 @@
       width: min(100%, 430px);
       height: min(860px, calc(100vh - 40px));
       min-height: 680px;
-      background: var(--surface);
+      background: var(--paper);
       border: 1px solid var(--line);
-      border-radius: 22px;
-      box-shadow: 0 18px 48px rgba(38, 31, 47, .18);
+      border-radius: 20px;
+      box-shadow: 0 18px 50px rgba(40, 32, 26, .18);
       overflow: hidden;
     }
 
     header {
-      padding: 18px 18px 12px;
-      background: var(--surface-2);
-      border-bottom: 1px solid var(--line);
-    }
-
-    .topline {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 14px;
+      padding: 18px 18px 14px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
     }
 
     h1 {
       margin: 0;
       font-size: 22px;
-      font-weight: 750;
+      font-weight: 800;
       letter-spacing: 0;
     }
 
@@ -78,75 +72,19 @@
       margin-top: 2px;
       color: var(--muted);
       font-size: 12px;
-    }
-
-    .status-pill {
-      flex: 0 0 auto;
-      padding: 7px 10px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: white;
-      color: var(--purple-deep);
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .status-panel {
-      margin-top: 14px;
-      padding: 12px;
-      border: 1px solid rgba(103, 80, 164, .2);
-      border-radius: 8px;
-      background: white;
-    }
-
-    .status-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      color: var(--purple-deep);
-      font-size: 14px;
-      font-weight: 800;
-    }
-
-    .status-copy {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
-
-    .metrics {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 10px;
-    }
-
-    .metric {
-      padding: 5px 8px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--surface-2);
-      font-size: 11px;
-      font-weight: 750;
-    }
-
-    .toolbar {
-      display: flex;
-      gap: 6px;
+      font-weight: 600;
     }
 
     .icon-button {
-      width: 34px;
-      height: 34px;
+      width: 38px;
+      height: 38px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: white;
       color: var(--ink);
       cursor: pointer;
       font: inherit;
-      font-size: 14px;
+      font-size: 18px;
       font-weight: 800;
     }
 
@@ -154,6 +92,7 @@
       flex: 1;
       overflow-y: auto;
       padding: 14px 16px 10px;
+      background: var(--wash);
     }
 
     .row {
@@ -168,20 +107,23 @@
     .bubble {
       max-width: 84%;
       padding: 11px 13px;
-      border: 1px solid #ebe5ef;
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: #f7f2fa;
-      line-height: 1.42;
+      background: white;
+      box-shadow: 0 4px 12px rgba(40, 32, 26, .035);
+      line-height: 1.44;
       white-space: pre-wrap;
       word-break: keep-all;
       overflow-wrap: anywhere;
       font-size: 15px;
+      font-weight: 500;
     }
 
     .user .bubble {
       border-color: transparent;
       color: white;
-      background: var(--purple);
+      background: var(--salmon);
+      box-shadow: none;
       border-bottom-right-radius: 2px;
     }
 
@@ -189,30 +131,10 @@
       border-bottom-left-radius: 2px;
     }
 
-    .message-meta {
+    .message-actions {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      margin-top: 8px;
-    }
-
-    .provider {
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 800;
-    }
-
-    .provider.watsonx {
-      color: var(--purple-deep);
-    }
-
-    .provider.error {
-      color: var(--red);
-    }
-
-    .provider.local_fallback {
-      color: var(--amber);
+      justify-content: flex-end;
+      margin-top: 7px;
     }
 
     .copy {
@@ -226,40 +148,39 @@
       padding: 4px 0;
     }
 
-    .notice {
+    .note {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       margin-top: 8px;
-      padding: 8px;
-      border: 1px solid rgba(138, 90, 0, .18);
-      border-radius: 8px;
-      background: rgba(138, 90, 0, .07);
-      color: #5c3b00;
-      font-size: 12px;
-      line-height: 1.35;
+      color: var(--warning);
+      font-size: 11px;
+      font-weight: 800;
     }
 
     .citations {
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-      margin-top: 8px;
+      margin-top: 9px;
     }
 
     .citation {
       max-width: 100%;
       padding: 5px 8px;
-      border: 1px solid #ddd2e8;
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: white;
+      background: var(--sage-soft);
+      color: var(--sage);
       font-size: 11px;
-      font-weight: 750;
+      font-weight: 800;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
     }
 
     .typing {
-      width: 112px;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
     }
@@ -267,8 +188,8 @@
     .spinner {
       width: 16px;
       height: 16px;
-      border: 2px solid #d0c4dc;
-      border-top-color: var(--purple);
+      border: 2px solid #f0c9c3;
+      border-top-color: var(--salmon);
       border-radius: 50%;
       animation: spin .8s linear infinite;
     }
@@ -282,32 +203,35 @@
       gap: 8px;
       overflow-x: auto;
       padding: 8px 16px;
+      background: var(--paper);
       border-top: 1px solid var(--line);
-      background: white;
     }
 
     .chip {
       flex: 0 0 auto;
       min-height: 38px;
-      padding: 0 12px;
-      border: 1px solid #d0c4dc;
+      padding: 0 13px;
+      border: 1px solid var(--line);
       border-radius: 8px;
       background: white;
-      color: #1d1b20;
+      color: var(--ink);
       font: inherit;
       font-size: 13px;
+      font-weight: 800;
       cursor: pointer;
     }
 
-    .chip strong {
-      color: var(--purple-deep);
+    .chip:hover,
+    .icon-button:hover {
+      border-color: #d1bfb4;
+      background: #fff7f2;
     }
 
     .composer {
       display: flex;
       gap: 8px;
       padding: 8px 16px 14px;
-      background: white;
+      background: var(--paper);
       border-top: 1px solid var(--line);
     }
 
@@ -318,14 +242,15 @@
       padding: 0 14px;
       border: 1px solid transparent;
       border-radius: 8px;
-      background: #f1edf4;
+      background: #f5efeb;
+      color: var(--ink);
       font: inherit;
       font-size: 15px;
       outline: none;
     }
 
     input:focus {
-      border-color: rgba(103, 80, 164, .44);
+      border-color: rgba(231, 111, 97, .58);
       background: white;
     }
 
@@ -334,11 +259,15 @@
       height: 46px;
       border: 0;
       border-radius: 8px;
-      background: var(--purple);
+      background: var(--salmon);
       color: white;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 850;
       cursor: pointer;
+    }
+
+    button.send:hover {
+      background: var(--salmon-dark);
     }
 
     button:disabled {
@@ -365,28 +294,11 @@
   <main class="shell">
     <section class="phone">
       <header>
-        <div class="topline">
-          <div>
-            <h1>Watson 챗봇</h1>
-            <div class="subtitle">watsonx Granite · screenshot assistant</div>
-          </div>
-          <div class="toolbar">
-            <button id="resetButton" class="icon-button" type="button" title="대화 초기화">↺</button>
-          </div>
+        <div>
+          <h1>T.Salmon</h1>
+          <div class="subtitle">스크린샷 정리</div>
         </div>
-
-        <section class="status-panel">
-          <div class="status-title">
-            <span id="statusTitle">챗봇 준비됨</span>
-            <span id="statusPill" class="status-pill">READY</span>
-          </div>
-          <div id="statusCopy" class="status-copy">질문을 보내면 저장된 스크린샷 기록과 Watsonx 연결 상태를 같이 확인합니다.</div>
-          <div class="metrics">
-            <span id="modelMetric" class="metric">model: checking</span>
-            <span id="sourceMetric" class="metric">source: none</span>
-            <span id="citationMetric" class="metric">citations: 0</span>
-          </div>
-        </section>
+        <button id="resetButton" class="icon-button" type="button" title="새 대화">↻</button>
       </header>
 
       <section id="messages" class="messages" aria-live="polite"></section>
@@ -395,7 +307,7 @@
 
       <form id="composer" class="composer">
         <input id="messageInput" autocomplete="off" placeholder="질문 입력">
-        <button id="sendButton" class="send" type="submit" aria-label="전송">SEND</button>
+        <button id="sendButton" class="send" type="submit" aria-label="전송">전송</button>
       </form>
     </section>
   </main>
@@ -408,62 +320,16 @@
     const input = document.querySelector("#messageInput");
     const sendButton = document.querySelector("#sendButton");
     const resetButton = document.querySelector("#resetButton");
-    const statusTitle = document.querySelector("#statusTitle");
-    const statusPill = document.querySelector("#statusPill");
-    const statusCopy = document.querySelector("#statusCopy");
-    const modelMetric = document.querySelector("#modelMetric");
-    const sourceMetric = document.querySelector("#sourceMetric");
-    const citationMetric = document.querySelector("#citationMetric");
     const history = [];
     let isSending = false;
 
     const quickPrompts = [
       { label: "요약", prompt: "최근 저장한 항목 요약해줘" },
-      { label: "일정", prompt: "일정등록 항목만 알려줘" },
-      { label: "지도", prompt: "지도에서 볼 항목 정리해줘" },
+      { label: "마감", prompt: "마감일 있는 항목만 정리해줘" },
+      { label: "장소", prompt: "지도에서 볼 항목 정리해줘" },
       { label: "장학금", prompt: "장학금 관련 정보 있어?" },
-      { label: "링크", prompt: "바로 열어볼 링크만 정리해줘" },
+      { label: "쿠폰", prompt: "쿠폰이나 기프티콘 사용기한 알려줘" },
     ];
-
-    function providerLabel(provider) {
-      if (provider === "watsonx") return "Watsonx 응답";
-      if (provider === "error") return "연결 오류";
-      if (provider === "local_fallback") return "로컬 보조 응답";
-      return "대기";
-    }
-
-    function setStatus(provider, notice, model, citationCount) {
-      const fallbackNotice = {
-        watsonx: "Watsonx Granite 모델이 응답했습니다.",
-        local_fallback: "서버는 정상이고 Watsonx 대신 로컬 보조 응답으로 전환했습니다.",
-        error: "백엔드 서버 또는 네트워크 연결을 확인해주세요.",
-        loading: "스크린샷 기록과 Watsonx 응답을 확인하고 있습니다.",
-        idle: "질문을 보내면 저장된 스크린샷 기록과 Watsonx 연결 상태를 같이 확인합니다.",
-      };
-
-      const title = {
-        watsonx: "Watsonx 연결됨",
-        local_fallback: "서버 연결됨",
-        error: "연결 오류",
-        loading: "응답 생성 중",
-        idle: "챗봇 준비됨",
-      };
-
-      statusTitle.textContent = title[provider] || title.idle;
-      statusPill.textContent = provider === "watsonx"
-        ? "WATSONX"
-        : provider === "local_fallback"
-          ? "FALLBACK"
-          : provider === "error"
-            ? "ERROR"
-            : provider === "loading"
-              ? "WAIT"
-              : "READY";
-      statusCopy.textContent = notice || fallbackNotice[provider] || fallbackNotice.idle;
-      modelMetric.textContent = `model: ${model || "ibm/granite-3-8b-instruct"}`;
-      sourceMetric.textContent = `source: ${providerLabel(provider)}`;
-      citationMetric.textContent = `citations: ${citationCount || 0}`;
-    }
 
     function addMessage(role, content, options = {}) {
       history.push({ role, content });
@@ -478,13 +344,6 @@
       text.textContent = content;
       bubble.append(text);
 
-      if (role === "assistant" && options.notice && options.provider !== "watsonx") {
-        const notice = document.createElement("div");
-        notice.className = "notice";
-        notice.textContent = options.notice;
-        bubble.append(notice);
-      }
-
       if (role === "assistant" && options.citations?.length) {
         const citations = document.createElement("div");
         citations.className = "citations";
@@ -493,20 +352,30 @@
           chip.className = "citation";
           const category = item.category || "미분류";
           const action = item.action_type || "해당없음";
-          chip.textContent = `${category} · ${action}`;
+          chip.textContent = action === "해당없음" ? category : `${category} · ${action}`;
           chip.title = item.summary || "";
           citations.append(chip);
         });
         bubble.append(citations);
       }
 
-      if (role === "assistant" && options.provider) {
-        const meta = document.createElement("div");
-        meta.className = "message-meta";
+      if (role === "assistant" && options.provider === "local_fallback") {
+        const note = document.createElement("div");
+        note.className = "note";
+        note.textContent = "저장된 기록 기준";
+        bubble.append(note);
+      }
 
-        const label = document.createElement("span");
-        label.className = `provider ${options.provider}`;
-        label.textContent = providerLabel(options.provider);
+      if (role === "assistant" && options.provider === "error") {
+        const note = document.createElement("div");
+        note.className = "note";
+        note.textContent = "잠시 후 다시 시도";
+        bubble.append(note);
+      }
+
+      if (role === "assistant") {
+        const actions = document.createElement("div");
+        actions.className = "message-actions";
 
         const copy = document.createElement("button");
         copy.className = "copy";
@@ -518,8 +387,8 @@
           setTimeout(() => { copy.textContent = "복사"; }, 900);
         });
 
-        meta.append(label, copy);
-        bubble.append(meta);
+        actions.append(copy);
+        bubble.append(actions);
       }
 
       row.append(bubble);
@@ -531,23 +400,13 @@
       const row = document.createElement("div");
       row.className = "row assistant";
       row.id = "typing";
-      row.innerHTML = '<div class="bubble typing"><span class="spinner"></span><span>답변 생성 중</span></div>';
+      row.innerHTML = '<div class="bubble typing"><span class="spinner"></span><span>정리 중</span></div>';
       messagesEl.append(row);
       messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
     function removeTyping() {
       document.querySelector("#typing")?.remove();
-    }
-
-    async function loadStatus() {
-      try {
-        const response = await fetch(`${baseUrl}/api/v1/chat/status`);
-        const data = await response.json();
-        setStatus("idle", data.message, data.model, 0);
-      } catch {
-        setStatus("error", "백엔드 서버 상태를 확인하지 못했습니다.", null, 0);
-      }
     }
 
     async function sendMessage(text) {
@@ -557,7 +416,6 @@
       isSending = true;
       input.value = "";
       sendButton.disabled = true;
-      setStatus("loading", null, null, 0);
       addMessage("user", message);
       addTyping();
 
@@ -575,19 +433,15 @@
         if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
         const data = await response.json();
         removeTyping();
-        addMessage("assistant", data.reply || "답변을 생성하지 못했습니다.", {
+        addMessage("assistant", data.reply || "답변을 만들지 못했어. 다시 물어봐줘.", {
           provider: data.provider || "watsonx",
-          notice: data.notice,
           citations: data.citations || [],
         });
-        setStatus(data.provider || "watsonx", data.notice, data.model, (data.citations || []).length);
-      } catch (error) {
+      } catch {
         removeTyping();
-        addMessage("assistant", `챗봇 연결에 실패했습니다.\n${error.message}`, {
+        addMessage("assistant", "지금은 연결이 불안정해. 서버를 켠 뒤 다시 시도해줘.", {
           provider: "error",
-          notice: "백엔드 서버가 켜져 있는지 확인해주세요.",
         });
-        setStatus("error", "백엔드 서버가 켜져 있는지 확인해주세요.", null, 0);
       } finally {
         isSending = false;
         sendButton.disabled = false;
@@ -598,8 +452,7 @@
     function resetChat() {
       history.length = 0;
       messagesEl.innerHTML = "";
-      setStatus("idle", null, null, 0);
-      addMessage("assistant", "대화를 초기화했습니다. 챗봇 UI와 응답 흐름을 다시 확인해보세요.");
+      addMessage("assistant", "좋아, 새로 시작하자. 어떤 스크린샷 정보를 찾을까?");
       input.focus();
     }
 
@@ -607,7 +460,7 @@
       const button = document.createElement("button");
       button.className = "chip";
       button.type = "button";
-      button.innerHTML = `<strong>${item.label}</strong> · ${item.prompt}`;
+      button.textContent = item.label;
       button.addEventListener("click", () => sendMessage(item.prompt));
       quickEl.append(button);
     });
@@ -619,8 +472,7 @@
 
     resetButton.addEventListener("click", resetChat);
 
-    addMessage("assistant", "안녕하세요. 저장된 스크린샷 분석 결과를 바탕으로 바로 정리해드릴게요.");
-    loadStatus();
+    addMessage("assistant", "찾고 싶은 내용을 말해줘. 저장된 스크린샷에서 필요한 것만 골라볼게.");
   </script>
 </body>
 </html>
