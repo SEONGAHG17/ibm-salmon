@@ -6,6 +6,8 @@ frontend/build/
 # Python local/generated files
 .venv/
 backend/__pycache__/
+backend/.env
+backend/serviceAccountKey.json
 
 # Android local/generated files
 frontend/android/.gradle/
